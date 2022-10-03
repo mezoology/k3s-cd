@@ -4,7 +4,6 @@ metadata:
   annotations:
     deployment.kubernetes.io/revision: "1"
     field.cattle.io/publicEndpoints: '[{"addresses":["10.0.0.62"],"port":80,"protocol":"HTTP","serviceName":"default:nginx","ingressName":"default:nginx","hostname":"ngn.lly.li","path":"/","allNodes":false}]'
-  generation: 4
   labels:
     mine: "yes"
     workload.user.cattle.io/workloadselector: apps.deployment-default-nginx
