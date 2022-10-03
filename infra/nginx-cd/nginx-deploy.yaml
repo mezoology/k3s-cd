@@ -4,7 +4,6 @@ metadata:
   annotations:
     deployment.kubernetes.io/revision: "1"
     field.cattle.io/publicEndpoints: '[{"addresses":["10.0.0.62"],"port":80,"protocol":"HTTP","serviceName":"default:nginx","ingressName":"default:nginx","hostname":"ngn.lly.li","path":"/","allNodes":false}]'
-  creationTimestamp: "2022-10-03T21:16:55Z"
   generation: 4
   labels:
     mine: "yes"
@@ -51,7 +50,6 @@ kind: Service
 metadata:
   name: nginx
   namespace: default
-  uid: 38503f26-c7e5-494c-bf07-53e05132c73b
 spec:
   clusterIP: 10.43.168.42
   clusterIPs:
