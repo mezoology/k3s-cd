@@ -139,7 +139,10 @@ spec:
             - name: bg-pv
               mountPath: /var/lib/postgresql/data
               subPath: wiki
-
+      volumes:
+      - name: bg-pv
+        persistentVolumeClaim:
+          claimName: wiki-db-pvc
 ---
 apiVersion: v1
 kind: Service
