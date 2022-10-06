@@ -31,7 +31,11 @@ spec:
               protocol: TCP
           env:
             - name: DB_PASS
-              value: wikijs
+              valueFrom:
+                secretKeyRef:
+                  key: ps1
+                  name: oracle-vault
+                  optional: false
             - name: DB_NAME
               value: wikijs
             - name: DB_PORT
@@ -120,7 +124,11 @@ spec:
             - name: POSTGRES_DB
               value: wikijs
             - name: POSTGRES_PASSWORD
-              value: wikijs
+              valueFrom:
+                secretKeyRef:
+                  key: ps1
+                  name: oracle-vault
+                  optional: false
             - name: POSTGRES_USER
               value: wikijs
           resources:
