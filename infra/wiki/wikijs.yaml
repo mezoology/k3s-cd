@@ -139,3 +139,46 @@ spec:
     app: db
   sessionAffinity: None
   type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki
+  namespace: default
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: wiki
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    field.cattle.io/publicEndpoints: '[{"port":80,"protocol":"HTTP","serviceName":"default:wiki","ingressName":"default:wiki","hostname":"wiki.lly.li","path":"/","allNodes":false}]'
+  generation: 1
+  name: wiki
+  namespace: default
+spec:
+  rules:
+  - host: wiki.lly.li
+    http:
+      paths:
+      - backend:
+          service:
+            name: wiki
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
