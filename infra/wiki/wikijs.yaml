@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+Namespace: Default
 metadata:
   name: wiki
   labels:
@@ -120,6 +121,7 @@ spec:
 ---
 apiVersion: v1
 kind: Service
+Namespace: Default
 metadata:
   name: db
   namespace: default
