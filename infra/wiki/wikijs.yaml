@@ -42,6 +42,10 @@ spec:
               value: postgres
             - name: DB_HOST
               value: wiki-db-srv
+          resources:
+            limits:
+              cpu: '0.25'
+              memory: '100Mi'
           readinessProbe:
             failureThreshold: 3
             successThreshold: 1
@@ -119,6 +123,11 @@ spec:
               value: wikijs
             - name: POSTGRES_USER
               value: wikijs
+          resources:
+            limits:
+              cpu: '0.25'
+              memory: '100Mi'
+              
 ---
 apiVersion: v1
 kind: Service
