@@ -89,6 +89,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: default
   name: db
   labels:
     app: db
@@ -124,8 +125,6 @@ kind: Service
 metadata:
   name: db
   namespace: default
-  resourceVersion: "1657267"
-  uid: c23a845d-1efd-4fb7-a07a-3ac3edc2b4e8
 spec:
   internalTrafficPolicy: Cluster
   ipFamilies:
