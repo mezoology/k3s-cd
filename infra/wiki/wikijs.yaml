@@ -177,7 +177,7 @@ spec:
       paths:
       - backend:
           service:
-            name: wiki
+            name: wiki-srv
             port:
               number: 80
         path: /
