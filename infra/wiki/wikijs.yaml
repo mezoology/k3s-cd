@@ -2,48 +2,45 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wiki
-  annotations:
-    {}
-#    key: string
   labels:
-    workload.user.cattle.io/workloadselector: apps.deployment-default-wiki
-#    key: string
-  namespace: default
+    app: wiki
+
 spec:
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: apps.deployment-default-wiki
+      app: 'wiki'
+
+  revisionHistoryLimit: 10
+  replicas: 1
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: apps.deployment-default-wiki
+        app: 'wiki'
     spec:
+      dnsPolicy: ClusterFirst
       containers:
-        - imagePullPolicy: IfNotPresent
-          name: wikijs
-          image: ghcr.io/requarks/wiki:2
+        - name: wiki
+          image: 'ghcr.io/requarks/wiki:2'
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              expose: true
+              containerPort: 3000
               protocol: TCP
-              containerPort: 80
-              _serviceType: ClusterIP
-              _ipam: dhcp
-              _name: http
           env:
-            - name: DB_TYPE
-              value: postgres
-            - name: DB_HOST
-              value: db
-            - name: DB_PORT
-              value: '5432'
-            - name: DB_USER
-              value: wikijs
             - name: DB_PASS
               value: wikijs
             - name: DB_NAME
               value: wikijs
-          __active: true
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_USER
+              value: wikijs
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_HOST
+              value: db
           readinessProbe:
             failureThreshold: 3
             successThreshold: 1
@@ -53,7 +50,7 @@ spec:
             httpGet:
               scheme: HTTP
               path: /healthz
-              port: ''
+              port: 3000
           livenessProbe:
             failureThreshold: 3
             successThreshold: 1
@@ -62,8 +59,8 @@ spec:
             periodSeconds: 10
             httpGet:
               scheme: HTTP
-              port: ''
               path: /healthz
+              port: 3000
           startupProbe:
             failureThreshold: 60
             successThreshold: 1
@@ -73,39 +70,45 @@ spec:
             httpGet:
               scheme: HTTP
               path: /healthz
-              port: ''
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-      volumes:
-  minReadySeconds: 0
-  progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
-#    type: RollingUpdate
-#  paused: boolean
-__clone: true
+              port: 3000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - web
+                topologyKey: kubernetes.io/hostname
+
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wiki
-  annotations:
-    {}
-#    key: string
+  name: db
   labels:
-    workload.user.cattle.io/workloadselector: apps.deployment-default-wiki
-#    key: string
-  namespace: default
+    app: db
+
+spec:
+  selector:
+    matchLabels:
+      app: 'db'
+
+  revisionHistoryLimit: 10
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: 'db'
     spec:
       containers:
         - imagePullPolicy: Always
           name: db
-          __active: true
           image: postgres:11-alpine
           env:
             - name: POSTGRES_DB
@@ -114,4 +117,25 @@ metadata:
               value: wikijs
             - name: POSTGRES_USER
               value: wikijs
-              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: default
+  resourceVersion: "1657267"
+  uid: c23a845d-1efd-4fb7-a07a-3ac3edc2b4e8
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: dbport
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: db
+  sessionAffinity: None
+  type: ClusterIP
