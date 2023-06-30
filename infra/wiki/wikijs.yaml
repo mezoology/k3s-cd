@@ -196,7 +196,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: wiki.lly.li
+  - host: wiki.deny.es
     http:
       paths:
       - backend:
